@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.json": "c",
+			"*.wiki": "plaintext",
+			"*.c": "c",
+			"display188.h": "c"
+		}
+	}
+}
