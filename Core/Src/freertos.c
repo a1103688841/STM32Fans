@@ -66,46 +66,46 @@ mainModel_t model = {
 
 static void sw0_down_callback(void* btn);
 /* USER CODE END Variables */
-/* Definitions for power */
-osThreadId_t powerHandle;
-const osThreadAttr_t power_attributes = {
-  .name = "power",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-/* Definitions for display */
-osThreadId_t displayHandle;
-const osThreadAttr_t display_attributes = {
-  .name = "display",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow1,
-};
-/* Definitions for gear */
-osThreadId_t gearHandle;
-const osThreadAttr_t gear_attributes = {
-  .name = "gear",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
-/* Definitions for key */
-osThreadId_t keyHandle;
-const osThreadAttr_t key_attributes = {
-  .name = "key",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
-};
+osThreadId powerHandle;
+uint32_t powerBuffer[ 128 ];
+osStaticThreadDef_t powerControlBlock;
+osThreadId displayHandle;
+uint32_t displayBuffer[ 128 ];
+osStaticThreadDef_t displayControlBlock;
+osThreadId gearHandle;
+uint32_t gearBuffer[ 128 ];
+osStaticThreadDef_t gearControlBlock;
+osThreadId keyHandle;
+uint32_t keyBuffer[ 128 ];
+osStaticThreadDef_t keyControlBlock;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
 /* USER CODE END FunctionPrototypes */
 
-void PowerTask(void *argument);
-void DisplayTask02(void *argument);
-void GearTask03(void *argument);
-void KeyTask04(void *argument);
+void PowerTask(void const * argument);
+void DisplayTask02(void const * argument);
+void GearTask03(void const * argument);
+void KeyTask04(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+
+/* GetIdleTaskMemory prototype (linked to static allocation support) */
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize );
+
+/* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
+static StaticTask_t xIdleTaskTCBBuffer;
+static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
+
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
+{
+  *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+  *ppxIdleTaskStackBuffer = &xIdleStack[0];
+  *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+  /* place for user code */
+}
+/* USER CODE END GET_IDLE_TASK_MEMORY */
 
 /**
   * @brief  FreeRTOS initialization
@@ -134,25 +134,25 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of power */
-  powerHandle = osThreadNew(PowerTask, NULL, &power_attributes);
+  /* definition and creation of power */
+  osThreadStaticDef(power, PowerTask, osPriorityNormal, 0, 128, powerBuffer, &powerControlBlock);
+  powerHandle = osThreadCreate(osThread(power), NULL);
 
-  /* creation of display */
-  displayHandle = osThreadNew(DisplayTask02, NULL, &display_attributes);
+  /* definition and creation of display */
+  osThreadStaticDef(display, DisplayTask02, osPriorityLow, 0, 128, displayBuffer, &displayControlBlock);
+  displayHandle = osThreadCreate(osThread(display), NULL);
 
-  /* creation of gear */
-  gearHandle = osThreadNew(GearTask03, NULL, &gear_attributes);
+  /* definition and creation of gear */
+  osThreadStaticDef(gear, GearTask03, osPriorityLow, 0, 128, gearBuffer, &gearControlBlock);
+  gearHandle = osThreadCreate(osThread(gear), NULL);
 
-  /* creation of key */
-  keyHandle = osThreadNew(KeyTask04, NULL, &key_attributes);
+  /* definition and creation of key */
+  osThreadStaticDef(key, KeyTask04, osPriorityLow, 0, 128, keyBuffer, &keyControlBlock);
+  keyHandle = osThreadCreate(osThread(key), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
-
-  /* USER CODE BEGIN RTOS_EVENTS */
-    /* add events, ... */
-  /* USER CODE END RTOS_EVENTS */
 
 }
 
@@ -163,7 +163,7 @@ void MX_FREERTOS_Init(void) {
   * @retval None
   */
 /* USER CODE END Header_PowerTask */
-void PowerTask(void *argument)
+void PowerTask(void const * argument)
 {
   /* USER CODE BEGIN PowerTask */
 	HAL_ADC_Start_DMA(&hadc1,(unsigned int *)&model.adc, 1);
@@ -184,7 +184,7 @@ void PowerTask(void *argument)
  * @retval None
  */
 /* USER CODE END Header_DisplayTask02 */
-void DisplayTask02(void *argument)
+void DisplayTask02(void const * argument)
 {
   /* USER CODE BEGIN DisplayTask02 */
     uint32_t          tickFrequency = pdMS_TO_TICKS(20);
@@ -225,7 +225,7 @@ void DisplayTask02(void *argument)
  * @retval None
  */
 /* USER CODE END Header_GearTask03 */
-void GearTask03(void *argument)
+void GearTask03(void const * argument)
 {
   /* USER CODE BEGIN GearTask03 */
     HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
@@ -270,7 +270,7 @@ void GearTask03(void *argument)
  * @retval None
  */
 /* USER CODE END Header_KeyTask04 */
-void KeyTask04(void *argument)
+void KeyTask04(void const * argument)
 {
   /* USER CODE BEGIN KeyTask04 */
     Button_Create("sw0", &sw0, get_PA15);
