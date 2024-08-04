@@ -54,7 +54,7 @@
 #define LONG_FREE_TRIGGER             0 
 
 #define BUTTON_CYCEL							20
-#define BUTTON_LEVEL_STABLE 	  	40/BUTTON_CYCEL   	//消抖时间      (1)*调用周期
+#define BUTTON_LEVEL_STABLE 	  	20/BUTTON_CYCEL   	//消抖时间      (1)*调用周期
 #define BUTTON_LONG_TIME 	      	2000/BUTTON_CYCEL		/* 持续n秒((n-1)*调用周期 ms)，认为长按事件 */
 #define BUTTON_LONG_CYCLE       	2000/BUTTON_CYCEL		//长按触发周期时间  (n-1)*调用周期 
 

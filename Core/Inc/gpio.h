@@ -39,6 +39,7 @@ extern "C" {
 void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+extern void  set_PB3to7_input();
 extern void set_PB3(bool level);
 extern void set_PB4(bool level);
 extern void set_PB5(bool level);

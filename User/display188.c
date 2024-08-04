@@ -1,36 +1,238 @@
 #include "display188.h"
 
 
-struct display188_t display188_var;
+display188_t display188_var;
+
+static void display188_analyse_handle()
+{
+    switch (display188_var.digit_1)
+    {
+        case 0:
+            display188_var.digit_1_seg = 0XE888;
+        break;
+    } 
+    switch(display188_var.digit_10)
+    {
+        case 0:
+            display188_var.digit_10_seg = 0X0770;
+        break;
+    }
+    switch(display188_var.digit_100)
+    {
+        case 0:
+            display188_var.digit_100_seg = 0X0000;
+        break;
+    }
+}
+
 void display188_refresh_handle()
 {
     enum STATE_E
     {
         STATE_NONE,
-        STATE_1,
-        STATE_10,
-        STATE_100,
+        STATE_P1,
+        STATE_P2,
+        STATE_P3,
+        STATE_P4,
     };
     static int state         = STATE_NONE;
     display188_var.digit_1   = display188_var.digit_all % 10;
     display188_var.digit_10  = display188_var.digit_all / 10 % 10;
     display188_var.digit_100 = display188_var.digit_all / 100 % 10;
+switch (display188_var.digit_1)
+{
+    case 0:
+        display188_var.digit_1_seg = 0xE888;
+        break;
+    case 1:
+        display188_var.digit_1_seg = 0x8080;
+        break;
+    case 2:
+        display188_var.digit_1_seg = 0xD808;
+        break;
+    case 3:
+        display188_var.digit_1_seg = 0xD880;
+        break;
+    case 4:
+        display188_var.digit_1_seg = 0xB080;
+        break;
+    case 5:
+        display188_var.digit_1_seg = 0x7880;
+        break;
+    case 6:
+        display188_var.digit_1_seg = 0x7888;
+        break;
+    case 7:
+        display188_var.digit_1_seg = 0x8880;
+        break;
+    case 8:
+        display188_var.digit_1_seg = 0xF888;
+        break;
+    case 9:
+        display188_var.digit_1_seg = 0xF880;
+        break;
+}
+
+switch (display188_var.digit_10)
+{
+    case 0:
+        display188_var.digit_10_seg = 0x0770;
+        break;
+    case 1:
+        display188_var.digit_10_seg = 0x0420;
+        break;
+    case 2:
+        display188_var.digit_10_seg = 0x0741;
+        break;
+    case 3:
+        display188_var.digit_10_seg = 0x0661;
+        break;
+    case 4:
+        display188_var.digit_10_seg = 0x0431;
+        break;
+    case 5:
+        display188_var.digit_10_seg = 0x0271;
+        break;
+    case 6:
+        display188_var.digit_10_seg = 0x0371;
+        break;
+    case 7:
+        display188_var.digit_10_seg = 0x0460;
+        break;
+    case 8:
+        display188_var.digit_10_seg = 0x0771;
+        break;
+    case 9:
+        display188_var.digit_10_seg = 0x0671;
+        break;
+}
+
+switch (display188_var.digit_100)
+{
+    case 0:
+        display188_var.digit_100_seg = 0x0000;
+        break;
+    case 1:
+        display188_var.digit_100_seg = 0x0006;
+        break;
+}
+
     switch (state)
     {
     case STATE_NONE:
-        state = STATE_1;
+        state = STATE_P1;
         break;
-    case STATE_1:
-        display188_1(display188_var.digit_1);
-        state = STATE_10;
+    case STATE_P1:
+        {
+            display188_var.LED12345_INPUT();
+            display188_var.LED1_DRIVER(0);
+            int p1_seg = 0x0000;
+            p1_seg = display188_var.digit_1_seg & 0XF000;
+            if(p1_seg & 0X8000)
+            {
+                display188_var.LED2_DRIVER(1);
+            }
+            if(p1_seg & 0X4000)
+            {
+                display188_var.LED3_DRIVER(1);
+            }
+            if(p1_seg & 0X2000)
+            {
+                display188_var.LED4_DRIVER(1);
+            }
+            if(p1_seg & 0X1000)
+            {
+                display188_var.LED5_DRIVER(1);
+            }
+        }
+        state = STATE_P2;
         break;
-    case STATE_10:
-        display188_10(display188_var.digit_10);
-        state = STATE_100;
+    case STATE_P2:
+        {
+            display188_var.LED12345_INPUT();
+            display188_var.LED2_DRIVER(0);
+            int p2_seg = 0x0000;
+            int p2_seg1 = 0x0000;
+            int p2_seg2 = 0x0000;
+            p2_seg1 = display188_var.digit_1_seg & 0X0F00;
+            p2_seg2 = (display188_var.digit_10_seg & 0X0F00);
+            p2_seg = p2_seg1 | p2_seg2;
+            if(p2_seg & 0X0800)
+            {
+                display188_var.LED1_DRIVER(1);
+            }
+            if(p2_seg & 0X0400)
+            {
+                display188_var.LED3_DRIVER(1);
+            }
+            if(p2_seg & 0X0200)
+            {
+                display188_var.LED4_DRIVER(1);
+            } 
+            if(p2_seg & 0X0100)
+            {
+                display188_var.LED5_DRIVER(1);
+            }   
+        }
+        state = STATE_P3;
         break;
-    case STATE_100:
-        display188_10(display188_var.digit_100);
-        state = STATE_1;
+    case STATE_P3:
+        {display188_var.LED12345_INPUT();
+            display188_var.LED3_DRIVER(0);
+            int p3_seg = 0x0000;
+            int p3_seg1 = 0x0000;
+            int p3_seg2 = 0x0000;
+            p3_seg1 = display188_var.digit_1_seg & 0X00F0;
+            p3_seg2 = (display188_var.digit_10_seg & 0X00F0);
+            p3_seg = p3_seg1 | p3_seg2;
+            if(p3_seg & 0X0080)
+            {
+                display188_var.LED1_DRIVER(1);
+            }
+            if(p3_seg & 0X0040)
+            {
+                display188_var.LED2_DRIVER(1);
+            }  
+            if(p3_seg & 0X0020)
+            {
+                display188_var.LED4_DRIVER(1);
+            } 
+            if(p3_seg & 0X0010)
+            {
+                display188_var.LED5_DRIVER(1);
+            }  
+        }
+        state = STATE_P4;
+        break;
+    case STATE_P4:
+        {display188_var.LED12345_INPUT();
+            display188_var.LED4_DRIVER(0);
+            int p4_seg = 0x0000;
+            int p4_seg1 = 0x0000;
+            int p4_seg2 = 0x0000;
+            int p4_seg3 = 0x0000;
+            p4_seg1 = display188_var.digit_1_seg & 0X000F;
+            p4_seg2 = (display188_var.digit_10_seg & 0X000F);
+            p4_seg3 = (display188_var.digit_100_seg & 0X000F);
+            p4_seg = p4_seg1 | p4_seg2 | p4_seg3;
+            if(p4_seg & 0X0008)
+            {
+                display188_var.LED1_DRIVER(1);
+            }
+            if(p4_seg & 0X0004)
+            {
+                display188_var.LED2_DRIVER(1);
+            }
+            if(p4_seg & 0X0002)
+            {
+                display188_var.LED3_DRIVER(1);
+            } 
+            if(p4_seg & 0X0001)
+            {
+                display188_var.LED5_DRIVER(1);
+            }
+        }
+        state = STATE_P1;
         break;
     }
 }

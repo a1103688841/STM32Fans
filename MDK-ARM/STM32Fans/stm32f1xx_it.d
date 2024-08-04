@@ -30,12 +30,3 @@ stm32fans\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.
 stm32fans\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 stm32fans\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 stm32fans\stm32f1xx_it.o: ../Core/Inc/stm32f1xx_it.h
-stm32fans\stm32f1xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h
-stm32fans\stm32f1xx_it.o: ../Core/Inc/FreeRTOSConfig.h
-stm32fans\stm32f1xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h
-stm32fans\stm32f1xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/portable.h
-stm32fans\stm32f1xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h
-stm32fans\stm32f1xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM3/portmacro.h
-stm32fans\stm32f1xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h
-stm32fans\stm32f1xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/task.h
-stm32fans\stm32f1xx_it.o: ../Middlewares/Third_Party/FreeRTOS/Source/include/list.h
